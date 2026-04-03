@@ -1,12 +1,12 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { Plus, Search, Sparkles, Trash2, ExternalLink, X, Lock, LogOut, Image as ImageIcon } from 'lucide-react'
+import { Plus, Search, Sparkles, Trash2, ExternalLink, X, Lock, LogOut, Image as ImageIcon, MapPin, Users } from 'lucide-react'
 import { ExpressShell } from '@/components/ExpressShell'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { RichTextEditor } from '@/components/RichTextEditor'
-import { Post } from '@/lib/supabase'
+import { Post, Visitor } from '@/lib/supabase'
 import { supabase } from '@/lib/supabase'
 import { generateSlug } from '@/lib/posts'
 
@@ -33,6 +33,8 @@ export default function ExpressAdminPage() {
   const [tags, setTags] = useState('')
   const [featuredImage, setFeaturedImage] = useState('')
   const [uploadingImage, setUploadingImage] = useState(false)
+  const [visitors, setVisitors] = useState<Visitor[]>([])
+  const [loadingVisitors, setLoadingVisitors] = useState(true)
 
   // Check authentication on mount
   useEffect(() => {
@@ -105,8 +107,23 @@ export default function ExpressAdminPage() {
   useEffect(() => {
     if (isAuthenticated) {
       fetchPosts()
+      fetchVisitors()
     }
   }, [isAuthenticated, fetchPosts])
+
+  const fetchVisitors = useCallback(async () => {
+    setLoadingVisitors(true)
+    try {
+      const res = await fetch('/api/visitors?days=7')
+      const data = await res.json()
+      setVisitors(Array.isArray(data) ? data : [])
+    } catch (error) {
+      console.error('Failed to fetch visitors:', error)
+      setVisitors([])
+    } finally {
+      setLoadingVisitors(false)
+    }
+  }, [])
 
   const drafts = posts.filter(p => p.status === 'Draft')
   const published = posts.filter(p => p.status === 'Published')
@@ -322,12 +339,46 @@ export default function ExpressAdminPage() {
           <p className="mt-3 text-3xl font-semibold text-white">{drafts.length}</p>
         </div>
         <div className="rounded-2xl border border-cyan-300/20 bg-cyan-300/10 p-5">
-          <p className="text-xs uppercase tracking-[0.16em] text-cyan-100/80">Identity Signal</p>
-          <p className="mt-3 flex items-center gap-2 text-lg font-medium text-cyan-50">
-            <Sparkles className="h-4 w-4" />
-            Distinctive publication voice
+          <p className="text-xs uppercase tracking-[0.16em] text-cyan-100/80">Visitors (7 days)</p>
+          <p className="mt-3 flex items-center gap-2 text-3xl font-semibold text-cyan-50">
+            <Users className="h-6 w-6" />
+            {visitors.length}
           </p>
         </div>
+      </section>
+
+      {/* Visitor Location Section */}
+      <section className="mb-8 rounded-2xl border border-white/10 bg-white/[0.03] p-6">
+        <h3 className="mb-4 flex items-center gap-2 text-lg font-medium text-white">
+          <MapPin className="h-5 w-5" />
+          Recent Visitors
+        </h3>
+        {loadingVisitors ? (
+          <p className="text-neutral-400">Loading visitor data...</p>
+        ) : visitors.length === 0 ? (
+          <p className="text-neutral-400">No visitor data yet.</p>
+        ) : (
+          <div className="space-y-2 max-h-60 overflow-y-auto">
+            {visitors.slice(0, 10).map((visitor) => (
+              <div
+                key={visitor.id}
+                className="flex items-center justify-between rounded-lg border border-white/10 bg-[#0b0f14] px-4 py-2 text-sm"
+              >
+                <div className="flex items-center gap-3">
+                  <span className="text-neutral-400">{visitor.page_path}</span>
+                  {visitor.ip_country && (
+                    <span className="rounded-full border border-cyan-300/30 bg-cyan-300/10 px-2 py-0.5 text-xs text-cyan-100">
+                      {visitor.ip_city ? `${visitor.ip_city}, ` : ''}{visitor.ip_country}
+                    </span>
+                  )}
+                </div>
+                <span className="text-xs text-neutral-500">
+                  {new Date(visitor.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
       </section>
 
       <section className="mb-8 rounded-2xl border border-white/10 bg-white/[0.03] p-5">

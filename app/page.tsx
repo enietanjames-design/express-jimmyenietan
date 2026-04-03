@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { ArrowUpRight } from "lucide-react"
 import { ExpressShell } from "@/components/ExpressShell"
+import { VisitorTracker } from "@/components/VisitorTracker"
 import { supabase } from "@/lib/supabase"
 import { Post } from "@/lib/supabase"
 
@@ -21,6 +22,7 @@ export default async function ExpressHomePage() {
 
   return (
     <ExpressShell>
+      <VisitorTracker pagePath="/" />
       <section className="mb-14 grid gap-8 lg:grid-cols-[1.5fr_1fr]">
         <div className="rounded-3xl border border-white/10 bg-gradient-to-br from-white/[0.07] to-transparent p-8 md:p-10">
           <p className="mb-3 text-xs uppercase tracking-[0.3em] text-cyan-300/90">Lead Story</p>

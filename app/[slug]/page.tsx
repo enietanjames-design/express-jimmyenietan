@@ -1,6 +1,8 @@
 import { notFound } from "next/navigation"
 import { Metadata } from "next"
 import { ExpressShell } from "@/components/ExpressShell"
+import { CommentSection } from "@/components/CommentSection"
+import { VisitorTracker } from "@/components/VisitorTracker"
 import { supabase } from "@/lib/supabase"
 import { Post } from "@/lib/supabase"
 
@@ -77,6 +79,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
 
   return (
     <ExpressShell>
+      <VisitorTracker postId={article.id} pagePath={`/${article.slug}`} />
       <article className="mx-auto max-w-3xl">
         <header className="mb-10 border-b border-white/10 pb-8">
           <p className="mb-4 text-xs uppercase tracking-[0.22em] text-cyan-300/90">{article.section}</p>
@@ -108,6 +111,8 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
             ))}
           </div>
         </footer>
+
+        <CommentSection postId={article.id} />
       </article>
     </ExpressShell>
   )
