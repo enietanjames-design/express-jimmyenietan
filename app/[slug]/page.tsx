@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation"
+import { Metadata } from "next"
 import { ExpressShell } from "@/components/ExpressShell"
 import { supabase } from "@/lib/supabase"
 import { Post } from "@/lib/supabase"
@@ -8,6 +9,54 @@ export const dynamic = 'force-dynamic'
 
 type ArticlePageProps = {
   params: Promise<{ slug: string }>
+}
+
+// Generate metadata for social sharing (Open Graph)
+export async function generateMetadata({ params }: ArticlePageProps): Promise<Metadata> {
+  const { slug } = await params
+  
+  const { data: post } = await supabase
+    .from('posts')
+    .select('*')
+    .eq('slug', slug)
+    .eq('status', 'Published')
+    .single()
+
+  if (!post) {
+    return {
+      title: 'Post Not Found'
+    }
+  }
+
+  const article = post as Post
+  const siteUrl = 'https://express.jimmyenietan.site'
+  const imageUrl = article.featured_image || `${siteUrl}/favicon.png`
+
+  return {
+    title: article.title,
+    description: article.dek,
+    openGraph: {
+      title: article.title,
+      description: article.dek,
+      type: 'article',
+      publishedTime: article.published_at || undefined,
+      authors: [article.author],
+      images: [
+        {
+          url: imageUrl,
+          width: 1200,
+          height: 630,
+          alt: article.title,
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: article.title,
+      description: article.dek,
+      images: [imageUrl],
+    },
+  }
 }
 
 export default async function ArticlePage({ params }: ArticlePageProps) {

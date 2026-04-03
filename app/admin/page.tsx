@@ -1,12 +1,13 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { Plus, Search, Sparkles, Trash2, ExternalLink, X, Lock, LogOut } from 'lucide-react'
+import { Plus, Search, Sparkles, Trash2, ExternalLink, X, Lock, LogOut, Image as ImageIcon } from 'lucide-react'
 import { ExpressShell } from '@/components/ExpressShell'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { RichTextEditor } from '@/components/RichTextEditor'
 import { Post } from '@/lib/supabase'
+import { supabase } from '@/lib/supabase'
 import { generateSlug } from '@/lib/posts'
 
 const SECTIONS = ['Featured', 'Essays', 'Insights']
@@ -30,6 +31,8 @@ export default function ExpressAdminPage() {
   const [section, setSection] = useState('Essays')
   const [body, setBody] = useState('')
   const [tags, setTags] = useState('')
+  const [featuredImage, setFeaturedImage] = useState('')
+  const [uploadingImage, setUploadingImage] = useState(false)
 
   // Check authentication on mount
   useEffect(() => {
@@ -124,6 +127,7 @@ export default function ExpressAdminPage() {
     setSection('Essays')
     setBody('')
     setTags('')
+    setFeaturedImage('')
     setEditingPost(null)
     setIsCreating(false)
   }
@@ -135,12 +139,41 @@ export default function ExpressAdminPage() {
     setSection(post.section)
     setBody(post.body || '')
     setTags(post.tags?.join(', ') || '')
+    setFeaturedImage(post.featured_image || '')
     setIsCreating(true)
   }
 
   const handleNew = () => {
     resetForm()
     setIsCreating(true)
+  }
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setUploadingImage(true)
+    try {
+      const fileExt = file.name.split('.').pop()
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`
+      
+      const { error: uploadError } = await supabase.storage
+        .from('post-images')
+        .upload(fileName, file)
+
+      if (uploadError) throw uploadError
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('post-images')
+        .getPublicUrl(fileName)
+
+      setFeaturedImage(publicUrl)
+    } catch (error) {
+      console.error('Failed to upload image:', error)
+      alert('Failed to upload image')
+    } finally {
+      setUploadingImage(false)
+    }
   }
 
   const handleSave = async (publish = false) => {
@@ -151,6 +184,7 @@ export default function ExpressAdminPage() {
       section,
       slug,
       body,
+      featured_image: featuredImage,
       tags: tags.split(',').map(t => t.trim()).filter(Boolean),
       status: publish ? 'Published' : 'Draft',
       published_at: publish ? new Date().toISOString() : null,
@@ -326,6 +360,37 @@ export default function ExpressAdminPage() {
               onChange={(e) => setTitle(e.target.value)}
               className="border-white/15 bg-[#0b0f14] text-neutral-100"
             />
+            
+            {/* Featured Image Upload */}
+            <div className="space-y-2">
+              <label className="text-sm text-neutral-400">Featured Image</label>
+              <div className="flex items-center gap-4">
+                <label className="cursor-pointer rounded-full border border-white/15 bg-[#0b0f14] px-4 py-2 text-sm text-neutral-200 transition hover:border-white/40 hover:bg-white/5">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    disabled={uploadingImage}
+                    className="hidden"
+                  />
+                  {uploadingImage ? 'Uploading...' : 'Upload Image'}
+                </label>
+                {featuredImage && (
+                  <div className="flex items-center gap-2">
+                    <img src={featuredImage} alt="Featured" className="h-12 w-12 rounded object-cover" />
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setFeaturedImage('')}
+                      className="text-red-400 hover:text-red-300"
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </div>
+            
             <div className="flex gap-4">
               <select
                 value={section}

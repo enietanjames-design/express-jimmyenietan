@@ -21,6 +21,7 @@ export type Database = {
           author: string
           tags: string[]
           body: string
+          featured_image: string | null
           created_at: string
           updated_at: string
         }
@@ -36,6 +37,7 @@ export type Database = {
           author?: string
           tags?: string[]
           body?: string
+          featured_image?: string
           created_at?: string
           updated_at?: string
         }
@@ -51,6 +53,7 @@ export type Database = {
           author?: string
           tags?: string[]
           body?: string
+          featured_image?: string
           created_at?: string
           updated_at?: string
         }

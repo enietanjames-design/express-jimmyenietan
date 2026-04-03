@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS posts (
   author TEXT DEFAULT 'Jimmy Enietan',
   tags TEXT[] DEFAULT '{}',
   body TEXT,
+  featured_image TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
