@@ -1,11 +1,20 @@
 import Link from "next/link"
 import { ArrowUpRight } from "lucide-react"
 import { ExpressShell } from "@/components/ExpressShell"
-import { expressPosts, publicationSections } from "@/data/express-posts"
+import { supabase } from "@/lib/supabase"
+import { Post } from "@/lib/supabase"
 
-export default function ExpressHomePage() {
-  const featuredPost = expressPosts.find((post) => post.section === "Featured" && post.status === "Published")
-  const publishedPosts = expressPosts.filter((post) => post.status === "Published")
+const SECTIONS = ["Featured", "Essays", "Insights"] as const
+
+export default async function ExpressHomePage() {
+  const { data: posts } = await supabase
+    .from('posts')
+    .select('*')
+    .eq('status', 'Published')
+    .order('published_at', { ascending: false })
+
+  const publishedPosts = posts as Post[] || []
+  const featuredPost = publishedPosts.find((post) => post.section === "Featured")
 
   return (
     <ExpressShell>
@@ -40,7 +49,7 @@ export default function ExpressHomePage() {
         </div>
       </section>
 
-      {publicationSections.map((section) => {
+      {SECTIONS.map((section) => {
         const sectionPosts = publishedPosts.filter((post) => post.section === section)
         if (sectionPosts.length === 0) return null
 
@@ -57,7 +66,7 @@ export default function ExpressHomePage() {
               {sectionPosts.map((post, index) => (
                 <Link
                   href={`/${post.slug}`}
-                  key={post.slug}
+                  key={post.id}
                   className={`group rounded-2xl border border-white/10 p-6 transition hover:border-white/30 hover:bg-white/[0.03] ${
                     index === 0 ? "md:col-span-2" : ""
                   }`}
@@ -68,9 +77,9 @@ export default function ExpressHomePage() {
                   </h4>
                   <p className="mb-5 max-w-2xl text-neutral-300">{post.dek}</p>
                   <div className="flex flex-wrap items-center gap-3 text-xs uppercase tracking-[0.14em] text-neutral-500">
-                    <span>{post.readingTime}</span>
+                    <span>{post.reading_time}</span>
                     <span className="h-1 w-1 rounded-full bg-neutral-500" />
-                    <span>{post.publishedAt}</span>
+                    <span>{post.published_at ? new Date(post.published_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : ''}</span>
                     <span className="h-1 w-1 rounded-full bg-neutral-500" />
                     <span>{post.author}</span>
                   </div>

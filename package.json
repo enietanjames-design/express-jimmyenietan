@@ -9,6 +9,14 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.39.0",
+    "@tailwindcss/typography": "^0.5.19",
+    "@tiptap/extension-image": "^2.2.0",
+    "@tiptap/extension-link": "^2.2.0",
+    "@tiptap/extension-placeholder": "^2.2.0",
+    "@tiptap/pm": "^2.2.0",
+    "@tiptap/react": "^2.2.0",
+    "@tiptap/starter-kit": "^2.2.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
     "lucide-react": "^0.344.0",
