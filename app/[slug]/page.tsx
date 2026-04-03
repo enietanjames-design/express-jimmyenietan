@@ -3,6 +3,9 @@ import { ExpressShell } from "@/components/ExpressShell"
 import { supabase } from "@/lib/supabase"
 import { Post } from "@/lib/supabase"
 
+// Disable caching - always fetch fresh data
+export const dynamic = 'force-dynamic'
+
 type ArticlePageProps = {
   params: Promise<{ slug: string }>
 }

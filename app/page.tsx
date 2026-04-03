@@ -6,6 +6,9 @@ import { Post } from "@/lib/supabase"
 
 const SECTIONS = ["Featured", "Essays", "Insights"] as const
 
+// Disable caching - always fetch fresh data
+export const dynamic = 'force-dynamic'
+
 export default async function ExpressHomePage() {
   const { data: posts } = await supabase
     .from('posts')
