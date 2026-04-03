@@ -1,0 +1,85 @@
+import Link from "next/link"
+import { ArrowUpRight } from "lucide-react"
+import { ExpressShell } from "@/components/ExpressShell"
+import { expressPosts, publicationSections } from "@/data/express-posts"
+
+export default function ExpressHomePage() {
+  const featuredPost = expressPosts.find((post) => post.section === "Featured" && post.status === "Published")
+  const publishedPosts = expressPosts.filter((post) => post.status === "Published")
+
+  return (
+    <ExpressShell>
+      <section className="mb-14 grid gap-8 lg:grid-cols-[1.5fr_1fr]">
+        <div className="rounded-3xl border border-white/10 bg-gradient-to-br from-white/[0.07] to-transparent p-8 md:p-10">
+          <p className="mb-3 text-xs uppercase tracking-[0.3em] text-cyan-300/90">Lead Story</p>
+          <h2 className="mb-4 max-w-2xl text-3xl font-semibold leading-tight text-white md:text-5xl">
+            {featuredPost?.title ?? "Express is where ideas become signature systems."}
+          </h2>
+          <p className="mb-8 max-w-2xl text-base leading-relaxed text-neutral-300 md:text-lg">
+            {featuredPost?.dek ??
+              "A minimalist editorial publication for founders, creators, and product leaders building authority through craft."}
+          </p>
+          {featuredPost ? (
+            <Link
+              href={`/${featuredPost.slug}`}
+              className="inline-flex items-center gap-2 rounded-full border border-white/20 px-5 py-2.5 text-sm text-white transition hover:border-cyan-300/70 hover:bg-cyan-300/10"
+            >
+              Read lead article
+              <ArrowUpRight className="h-4 w-4" />
+            </Link>
+          ) : null}
+        </div>
+        <div className="space-y-4 rounded-3xl border border-white/10 bg-white/[0.03] p-6">
+          <p className="text-xs uppercase tracking-[0.24em] text-neutral-400">Editorial Code</p>
+          <ul className="space-y-3 text-sm leading-relaxed text-neutral-300">
+            <li>Identity over templates.</li>
+            <li>Typography before decoration.</li>
+            <li>Distinct sections with distinct intent.</li>
+            <li>Readable futurism, never noise.</li>
+          </ul>
+        </div>
+      </section>
+
+      {publicationSections.map((section) => {
+        const sectionPosts = publishedPosts.filter((post) => post.section === section)
+        if (sectionPosts.length === 0) return null
+
+        return (
+          <section key={section} className="mb-14">
+            <div className="mb-6 flex items-end justify-between gap-4 border-b border-white/10 pb-3">
+              <h3 className="text-xl font-semibold tracking-tight md:text-2xl">{section}</h3>
+              <span className="text-xs uppercase tracking-[0.18em] text-neutral-500">
+                {sectionPosts.length} piece{sectionPosts.length > 1 ? "s" : ""}
+              </span>
+            </div>
+
+            <div className="grid gap-5 md:grid-cols-2">
+              {sectionPosts.map((post, index) => (
+                <Link
+                  href={`/${post.slug}`}
+                  key={post.slug}
+                  className={`group rounded-2xl border border-white/10 p-6 transition hover:border-white/30 hover:bg-white/[0.03] ${
+                    index === 0 ? "md:col-span-2" : ""
+                  }`}
+                >
+                  <p className="mb-3 text-xs uppercase tracking-[0.2em] text-cyan-300/80">{post.section}</p>
+                  <h4 className="mb-3 max-w-3xl text-2xl font-medium leading-tight text-white transition group-hover:text-cyan-100">
+                    {post.title}
+                  </h4>
+                  <p className="mb-5 max-w-2xl text-neutral-300">{post.dek}</p>
+                  <div className="flex flex-wrap items-center gap-3 text-xs uppercase tracking-[0.14em] text-neutral-500">
+                    <span>{post.readingTime}</span>
+                    <span className="h-1 w-1 rounded-full bg-neutral-500" />
+                    <span>{post.publishedAt}</span>
+                    <span className="h-1 w-1 rounded-full bg-neutral-500" />
+                    <span>{post.author}</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )
+      })}
+    </ExpressShell>
+  )
+}
