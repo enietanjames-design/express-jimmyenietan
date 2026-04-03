@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { Plus, Search, Sparkles, Trash2, ExternalLink, X } from 'lucide-react'
+import { Plus, Search, Sparkles, Trash2, ExternalLink, X, Lock, LogOut } from 'lucide-react'
 import { ExpressShell } from '@/components/ExpressShell'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -12,6 +12,12 @@ import { generateSlug } from '@/lib/posts'
 const SECTIONS = ['Featured', 'Essays', 'Insights']
 
 export default function ExpressAdminPage() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [checkingAuth, setCheckingAuth] = useState(true)
+  const [password, setPassword] = useState('')
+  const [loginError, setLoginError] = useState('')
+  const [loggingIn, setLoggingIn] = useState(false)
+  
   const [posts, setPosts] = useState<Post[]>([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
@@ -24,6 +30,53 @@ export default function ExpressAdminPage() {
   const [section, setSection] = useState('Essays')
   const [body, setBody] = useState('')
   const [tags, setTags] = useState('')
+
+  // Check authentication on mount
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const res = await fetch('/api/auth')
+        const data = await res.json()
+        setIsAuthenticated(data.authenticated)
+      } catch {
+        setIsAuthenticated(false)
+      } finally {
+        setCheckingAuth(false)
+      }
+    }
+    checkAuth()
+  }, [])
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoggingIn(true)
+    setLoginError('')
+    
+    try {
+      const res = await fetch('/api/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password })
+      })
+      const data = await res.json()
+      
+      if (data.success) {
+        setIsAuthenticated(true)
+        setPassword('')
+      } else {
+        setLoginError('Invalid password')
+      }
+    } catch {
+      setLoginError('Login failed')
+    } finally {
+      setLoggingIn(false)
+    }
+  }
+
+  const handleLogout = async () => {
+    await fetch('/api/auth', { method: 'DELETE' })
+    setIsAuthenticated(false)
+  }
 
   const fetchPosts = useCallback(async () => {
     setLoading(true)
@@ -47,8 +100,10 @@ export default function ExpressAdminPage() {
   }, [])
 
   useEffect(() => {
-    fetchPosts()
-  }, [fetchPosts])
+    if (isAuthenticated) {
+      fetchPosts()
+    }
+  }, [isAuthenticated, fetchPosts])
 
   const drafts = posts.filter(p => p.status === 'Draft')
   const published = posts.filter(p => p.status === 'Published')
@@ -161,16 +216,67 @@ export default function ExpressAdminPage() {
 
   return (
     <ExpressShell>
-      <section className="mb-8 flex flex-wrap items-end justify-between gap-5">
-        <div>
-          <p className="mb-2 text-xs uppercase tracking-[0.2em] text-cyan-300/90">Creator Workspace</p>
-          <h2 className="text-3xl font-semibold tracking-tight text-white md:text-4xl">Editorial Control Room</h2>
+      {/* Loading state */}
+      {checkingAuth && (
+        <div className="flex items-center justify-center py-20">
+          <p className="text-neutral-400">Loading...</p>
         </div>
-        <Button onClick={handleNew} className="rounded-full border border-cyan-300/40 bg-cyan-300/15 text-cyan-100 hover:bg-cyan-300/25">
-          <Plus className="mr-2 h-4 w-4" />
-          New draft
-        </Button>
-      </section>
+      )}
+
+      {/* Login form */}
+      {!checkingAuth && !isAuthenticated && (
+        <div className="mx-auto max-w-md py-20">
+          <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-8">
+            <div className="mb-6 flex items-center justify-center">
+              <div className="rounded-full border border-cyan-300/30 bg-cyan-300/10 p-4">
+                <Lock className="h-8 w-8 text-cyan-300" />
+              </div>
+            </div>
+            <h2 className="mb-2 text-center text-2xl font-semibold text-white">Admin Access</h2>
+            <p className="mb-6 text-center text-sm text-neutral-400">Enter password to access the workspace</p>
+            
+            <form onSubmit={handleLogin} className="space-y-4">
+              <Input
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="border-white/15 bg-[#0b0f14] text-neutral-100"
+              />
+              {loginError && (
+                <p className="text-sm text-red-400">{loginError}</p>
+              )}
+              <Button 
+                type="submit" 
+                disabled={loggingIn}
+                className="w-full rounded-full bg-cyan-400/80 text-[#03131c] hover:bg-cyan-300"
+              >
+                {loggingIn ? 'Logging in...' : 'Enter Workspace'}
+              </Button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Admin dashboard */}
+      {!checkingAuth && isAuthenticated && (
+        <>
+          <section className="mb-8 flex flex-wrap items-end justify-between gap-5">
+            <div>
+              <p className="mb-2 text-xs uppercase tracking-[0.2em] text-cyan-300/90">Creator Workspace</p>
+              <h2 className="text-3xl font-semibold tracking-tight text-white md:text-4xl">Editorial Control Room</h2>
+            </div>
+            <div className="flex gap-3">
+              <Button onClick={handleNew} className="rounded-full border border-cyan-300/40 bg-cyan-300/15 text-cyan-100 hover:bg-cyan-300/25">
+                <Plus className="mr-2 h-4 w-4" />
+                New draft
+              </Button>
+              <Button onClick={handleLogout} variant="outline" className="rounded-full border-white/20 bg-transparent text-neutral-100 hover:bg-white/10">
+                <LogOut className="mr-2 h-4 w-4" />
+                Logout
+              </Button>
+            </div>
+          </section>
 
       <section className="mb-8 grid gap-4 sm:grid-cols-3">
         <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
@@ -347,6 +453,8 @@ export default function ExpressAdminPage() {
           </div>
         )}
       </section>
+        </>
+      )}
     </ExpressShell>
   )
 }
