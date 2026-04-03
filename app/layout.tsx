@@ -4,6 +4,10 @@ import "./globals.css"
 export const metadata: Metadata = {
   title: "Express | Digital Publication",
   description: "A minimalist editorial publication for founders, creators, and product leaders building authority through craft.",
+  icons: {
+    icon: '/favicon.png',
+    apple: '/favicon.png',
+  },
 }
 
 export default function RootLayout({
