@@ -7,9 +7,9 @@ import Link from '@tiptap/extension-link'
 import Placeholder from '@tiptap/extension-placeholder'
 import { useCallback } from 'react'
 import { 
-  Bold, Italic, StrikeThrough, Code, Heading1, Heading2, 
-  BulletList, OrderedList, Quote, Undo, Redo, 
-  Image as ImageIcon, Link as LinkIcon, List 
+  Bold, Italic, Strikethrough, Code, Heading1, Heading2, 
+  List, ListOrdered, Quote, Undo, Redo, 
+  Image as ImageIcon, Link as LinkIcon 
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { supabase } from '@/lib/supabase'
@@ -98,7 +98,7 @@ export function RichTextEditor({ content, onChange, placeholder = 'Start writing
           <Italic className="h-4 w-4" />
         </ToolbarButton>
         <ToolbarButton onClick={() => editor.chain().focus().toggleStrike().run()} active={editor.isActive('strike')}>
-          <StrikeThrough className="h-4 w-4" />
+          <Strikethrough className="h-4 w-4" />
         </ToolbarButton>
         <ToolbarButton onClick={() => editor.chain().focus().toggleCode().run()} active={editor.isActive('code')}>
           <Code className="h-4 w-4" />
@@ -116,10 +116,10 @@ export function RichTextEditor({ content, onChange, placeholder = 'Start writing
         <div className="w-px h-6 bg-white/20 mx-1" />
         
         <ToolbarButton onClick={() => editor.chain().focus().toggleBulletList().run()} active={editor.isActive('bulletList')}>
-          <BulletList className="h-4 w-4" />
+          <List className="h-4 w-4" />
         </ToolbarButton>
         <ToolbarButton onClick={() => editor.chain().focus().toggleOrderedList().run()} active={editor.isActive('orderedList')}>
-          <OrderedList className="h-4 w-4" />
+          <ListOrdered className="h-4 w-4" />
         </ToolbarButton>
         <ToolbarButton onClick={() => editor.chain().focus().toggleBlockquote().run()} active={editor.isActive('blockquote')}>
           <Quote className="h-4 w-4" />
