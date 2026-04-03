@@ -30,9 +30,17 @@ export default function ExpressAdminPage() {
     try {
       const res = await fetch('/api/posts')
       const data = await res.json()
-      setPosts(data)
+      if (Array.isArray(data)) {
+        setPosts(data)
+      } else if (Array.isArray(data.data)) {
+        setPosts(data.data)
+      } else {
+        console.error('Invalid response format:', data)
+        setPosts([])
+      }
     } catch (error) {
       console.error('Failed to fetch posts:', error)
+      setPosts([])
     } finally {
       setLoading(false)
     }

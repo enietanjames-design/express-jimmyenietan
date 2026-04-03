@@ -3,16 +3,22 @@ import { supabase } from '@/lib/supabase'
 import { generateSlug } from '@/lib/posts'
 
 export async function GET() {
-  const { data, error } = await supabase
-    .from('posts')
-    .select('*')
-    .order('created_at', { ascending: false })
-  
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+  try {
+    const { data, error } = await supabase
+      .from('posts')
+      .select('*')
+      .order('created_at', { ascending: false })
+    
+    if (error) {
+      console.error('Supabase error:', error)
+      return NextResponse.json({ error: error.message, data: [] }, { status: 500 })
+    }
+    
+    return NextResponse.json(data || [])
+  } catch (err) {
+    console.error('API error:', err)
+    return NextResponse.json({ error: 'Failed to fetch posts', data: [] }, { status: 500 })
   }
-  
-  return NextResponse.json(data)
 }
 
 export async function POST(request: NextRequest) {
