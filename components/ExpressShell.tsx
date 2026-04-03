@@ -16,7 +16,7 @@ export function ExpressShell({ children }: ExpressShellProps) {
                 <Sparkles className="h-4 w-4 text-cyan-300" />
               </span>
               <div>
-                <p className="text-xs uppercase tracking-[0.25em] text-neutral-400">Digital Publication</p>
+                <p className="text-xs uppercase tracking-[0.25em] text-neutral-400">The Many Dimensions of Me</p>
                 <h1 className="text-2xl font-semibold tracking-tight md:text-3xl">Express</h1>
               </div>
             </Link>

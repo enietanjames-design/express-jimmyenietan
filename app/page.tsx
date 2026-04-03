@@ -25,11 +25,11 @@ export default async function ExpressHomePage() {
         <div className="rounded-3xl border border-white/10 bg-gradient-to-br from-white/[0.07] to-transparent p-8 md:p-10">
           <p className="mb-3 text-xs uppercase tracking-[0.3em] text-cyan-300/90">Lead Story</p>
           <h2 className="mb-4 max-w-2xl text-3xl font-semibold leading-tight text-white md:text-5xl">
-            {featuredPost?.title ?? "Express is where ideas become signature systems."}
+            {featuredPost?.title ?? "One mind. Many dimensions. Infinite expression."}
           </h2>
           <p className="mb-8 max-w-2xl text-base leading-relaxed text-neutral-300 md:text-lg">
             {featuredPost?.dek ??
-              "A minimalist editorial publication for founders, creators, and product leaders building authority through craft."}
+              "Express is where I unfold the many layers of who I am—founder, creator, thinker, builder. A space for every dimension of my expression, unfiltered and unapologetic."}
           </p>
           {featuredPost ? (
             <Link
@@ -42,12 +42,12 @@ export default async function ExpressHomePage() {
           ) : null}
         </div>
         <div className="space-y-4 rounded-3xl border border-white/10 bg-white/[0.03] p-6">
-          <p className="text-xs uppercase tracking-[0.24em] text-neutral-400">Editorial Code</p>
+          <p className="text-xs uppercase tracking-[0.24em] text-neutral-400">The Many of Me</p>
           <ul className="space-y-3 text-sm leading-relaxed text-neutral-300">
-            <li>Identity over templates.</li>
-            <li>Typography before decoration.</li>
-            <li>Distinct sections with distinct intent.</li>
-            <li>Readable futurism, never noise.</li>
+            <li>I am not one thing—I am many.</li>
+            <li>Every thought deserves its own canvas.</li>
+            <li>Expression without limitation.</li>
+            <li>Authenticity over conformity.</li>
           </ul>
         </div>
       </section>
