@@ -1,31 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase'
 
-// Get visitor IP from request headers
-function getIP(request: NextRequest): string | null {
-  const xff = request.headers.get('x-forwarded-for')
-  if (xff) {
-    return xff.split(',')[0].trim()
+// Get geolocation from Vercel headers (accurate, real-time)
+function getGeoFromHeaders(request: NextRequest): { country: string | null; city: string | null } {
+  // Vercel provides these headers automatically at the edge
+  const country = request.headers.get('x-vercel-ip-country')
+  const city = request.headers.get('x-vercel-ip-city')
+  
+  return {
+    country,
+    city,
   }
-  return request.headers.get('x-real-ip') || null
-}
-
-// Fetch geolocation data from IP
-async function getGeoFromIP(ip: string): Promise<{ country: string | null; city: string | null }> {
-  try {
-    const res = await fetch(`http://ip-api.com/json/${ip}?fields=status,country,city`)
-    const data = await res.json()
-    
-    if (data.status === 'success') {
-      return {
-        country: data.country || null,
-        city: data.city || null,
-      }
-    }
-  } catch (error) {
-    console.error('Failed to fetch geo data:', error)
-  }
-  return { country: null, city: null }
 }
 
 // POST new visitor record
@@ -33,16 +18,10 @@ export async function POST(request: NextRequest) {
   const body = await request.json()
   const { post_id, page_path, referrer, user_agent } = body
 
-  // Get IP and geolocation
-  const ip = getIP(request)
-  let ip_country: string | null = null
-  let ip_city: string | null = null
-
-  if (ip && ip !== '127.0.0.1' && ip !== '::1') {
-    const geo = await getGeoFromIP(ip)
-    ip_country = geo.country
-    ip_city = geo.city
-  }
+  // Get geolocation from Vercel headers (accurate, real-time)
+  const geo = getGeoFromHeaders(request)
+  const ip_country = geo.country
+  const ip_city = geo.city
 
   const { data, error } = await supabase
     .from('visitors')
