@@ -65,7 +65,7 @@ export function PostActions({ postTitle, postId }: PostActionsProps) {
         </Button>
         
         {showShare && (
-          <div className="absolute right-0 top-10 z-50 flex gap-2 rounded-xl border border-white/10 bg-[#0b0f14] p-3 shadow-lg">
+          <div className="absolute left-1/2 -translate-x-1/2 top-12 z-50 grid grid-cols-4 gap-2 rounded-xl border border-white/10 bg-[#0b0f14] p-3 shadow-lg">
             <a
               href={shareLinks.twitter}
               target="_blank"
