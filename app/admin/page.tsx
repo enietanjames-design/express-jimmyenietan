@@ -104,13 +104,6 @@ export default function ExpressAdminPage() {
     }
   }, [])
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      fetchPosts()
-      fetchVisitors()
-    }
-  }, [isAuthenticated, fetchPosts])
-
   const fetchVisitors = useCallback(async () => {
     setLoadingVisitors(true)
     try {
@@ -124,6 +117,16 @@ export default function ExpressAdminPage() {
       setLoadingVisitors(false)
     }
   }, [])
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchPosts()
+      fetchVisitors()
+      // Auto-refresh visitors every 10 seconds for real-time updates
+      const interval = setInterval(fetchVisitors, 10000)
+      return () => clearInterval(interval)
+    }
+  }, [isAuthenticated, fetchPosts, fetchVisitors])
 
   const drafts = posts.filter(p => p.status === 'Draft')
   const published = posts.filter(p => p.status === 'Published')
@@ -349,17 +352,23 @@ export default function ExpressAdminPage() {
 
       {/* Visitor Location Section */}
       <section className="mb-8 rounded-2xl border border-white/10 bg-white/[0.03] p-6">
-        <h3 className="mb-4 flex items-center gap-2 text-lg font-medium text-white">
-          <MapPin className="h-5 w-5" />
-          Recent Visitors
-        </h3>
+        <div className="mb-4 flex items-center justify-between">
+          <h3 className="flex items-center gap-2 text-lg font-medium text-white">
+            <MapPin className="h-5 w-5" />
+            Recent Visitors
+            <span className="rounded-full bg-cyan-300/20 px-2 py-0.5 text-xs text-cyan-100">
+              {visitors.length}
+            </span>
+          </h3>
+          <span className="text-xs text-neutral-500">Auto-refreshes every 10s</span>
+        </div>
         {loadingVisitors ? (
           <p className="text-neutral-400">Loading visitor data...</p>
         ) : visitors.length === 0 ? (
           <p className="text-neutral-400">No visitor data yet.</p>
         ) : (
-          <div className="space-y-2 max-h-60 overflow-y-auto">
-            {visitors.slice(0, 10).map((visitor) => (
+          <div className="max-h-96 space-y-2 overflow-y-auto">
+            {visitors.slice(0, 50).map((visitor) => (
               <div
                 key={visitor.id}
                 className="flex items-center justify-between rounded-lg border border-white/10 bg-[#0b0f14] px-4 py-2 text-sm"

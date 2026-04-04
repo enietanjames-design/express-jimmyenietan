@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
     .select('*')
     .gte('created_at', startDate.toISOString())
     .order('created_at', { ascending: false })
-    .limit(100)
+    .limit(500)
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 })
