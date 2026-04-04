@@ -72,6 +72,14 @@ export type Comment = {
   author_name: string
   author_email: string | null
   content: string
+  parent_id: string | null
+  created_at: string
+}
+
+export type Reaction = {
+  id: string
+  comment_id: string
+  reaction_type: string
   created_at: string
 }
 

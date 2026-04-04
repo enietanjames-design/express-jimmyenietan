@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
 // POST new comment
 export async function POST(request: NextRequest) {
   const body = await request.json()
-  const { post_id, author_name, author_email, content } = body
+  const { post_id, author_name, author_email, content, parent_id } = body
 
   if (!post_id || !author_name || !content) {
     return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
@@ -39,6 +39,7 @@ export async function POST(request: NextRequest) {
       author_name,
       author_email: author_email || null,
       content,
+      parent_id: parent_id || null,
     })
     .select()
     .single()
