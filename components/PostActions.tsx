@@ -65,42 +65,53 @@ export function PostActions({ postTitle, postId }: PostActionsProps) {
         </Button>
         
         {showShare && (
-          <div className="absolute left-1/2 -translate-x-1/2 top-12 z-50 grid grid-cols-4 gap-2 rounded-xl border border-white/10 bg-[#0b0f14] p-3 shadow-lg">
-            <a
-              href={shareLinks.twitter}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex h-10 w-10 items-center justify-center rounded-full bg-white/5 transition hover:bg-white/10"
-              title="Share on Twitter"
-            >
-              <Twitter className="h-5 w-5 text-neutral-300" />
-            </a>
-            <a
-              href={shareLinks.facebook}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex h-10 w-10 items-center justify-center rounded-full bg-white/5 transition hover:bg-white/10"
-              title="Share on Facebook"
-            >
-              <Facebook className="h-5 w-5 text-neutral-300" />
-            </a>
-            <a
-              href={shareLinks.linkedin}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex h-10 w-10 items-center justify-center rounded-full bg-white/5 transition hover:bg-white/10"
-              title="Share on LinkedIn"
-            >
-              <Linkedin className="h-5 w-5 text-neutral-300" />
-            </a>
-            <button
-              onClick={copyToClipboard}
-              className="flex h-10 w-10 items-center justify-center rounded-full bg-white/5 transition hover:bg-white/10"
-              title="Copy link"
-            >
-              <Link2 className="h-5 w-5 text-neutral-300" />
-            </button>
-          </div>
+          <>
+            {/* Backdrop */}
+            <div 
+              className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
+              onClick={() => setShowShare(false)}
+            />
+            {/* Share Modal */}
+            <div className="fixed left-1/2 top-1/2 z-50 -translate-x-1/2 -translate-y-1/2 flex gap-3 rounded-xl border border-white/10 bg-[#0b0f14] p-4 shadow-xl">
+              <a
+                href={shareLinks.twitter}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setShowShare(false)}
+                className="flex h-12 w-12 items-center justify-center rounded-full bg-white/5 transition hover:bg-white/10"
+                title="Share on Twitter"
+              >
+                <Twitter className="h-6 w-6 text-neutral-300" />
+              </a>
+              <a
+                href={shareLinks.facebook}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setShowShare(false)}
+                className="flex h-12 w-12 items-center justify-center rounded-full bg-white/5 transition hover:bg-white/10"
+                title="Share on Facebook"
+              >
+                <Facebook className="h-6 w-6 text-neutral-300" />
+              </a>
+              <a
+                href={shareLinks.linkedin}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setShowShare(false)}
+                className="flex h-12 w-12 items-center justify-center rounded-full bg-white/5 transition hover:bg-white/10"
+                title="Share on LinkedIn"
+              >
+                <Linkedin className="h-6 w-6 text-neutral-300" />
+              </a>
+              <button
+                onClick={copyToClipboard}
+                className="flex h-12 w-12 items-center justify-center rounded-full bg-white/5 transition hover:bg-white/10"
+                title="Copy link"
+              >
+                <Link2 className="h-6 w-6 text-neutral-300" />
+              </button>
+            </div>
+          </>
         )}
       </div>
     </div>
