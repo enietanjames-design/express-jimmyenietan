@@ -3,6 +3,7 @@ import { Metadata } from "next"
 import { ExpressShell } from "@/components/ExpressShell"
 import { CommentSection } from "@/components/CommentSection"
 import { VisitorTracker } from "@/components/VisitorTracker"
+import { PostActions } from "@/components/PostActions"
 import { supabase } from "@/lib/supabase"
 import { Post } from "@/lib/supabase"
 
@@ -99,7 +100,12 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
           dangerouslySetInnerHTML={{ __html: article.body || '' }} 
         />
 
-        <footer className="mt-12 border-t border-white/10 pt-6">
+        {/* Post Actions - Like & Share */}
+        <div className="mt-8 flex items-center justify-between border-t border-b border-white/10 py-4">
+          <PostActions postTitle={article.title} postId={article.id} />
+        </div>
+
+        <footer className="mt-8 border-t border-white/10 pt-6">
           <div className="flex flex-wrap gap-2">
             {article.tags?.map((tag) => (
               <span

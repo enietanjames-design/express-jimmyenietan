@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { MessageCircle, Send, Reply, Heart, ThumbsUp, Laugh, Angry, Share2, X, Twitter, Facebook, Linkedin, Link2 } from 'lucide-react'
+import { MessageCircle, Send, Reply, Heart, ThumbsUp, Laugh, Angry, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Comment, Reaction } from '@/lib/supabase'
@@ -31,7 +31,6 @@ export function CommentSection({ postId, postTitle }: CommentSectionProps) {
   const [submittingReply, setSubmittingReply] = useState(false)
   const [reactions, setReactions] = useState<Record<string, Reaction[]>>({})
   const [showReactions, setShowReactions] = useState<string | null>(null)
-  const [showShare, setShowShare] = useState<string | null>(null)
 
   useEffect(() => {
     fetchComments()
@@ -135,20 +134,6 @@ export function CommentSection({ postId, postTitle }: CommentSectionProps) {
       console.error('Failed to add reaction:', error)
     }
     setShowReactions(null)
-  }
-
-  const shareUrl = typeof window !== 'undefined' ? window.location.href : ''
-  const shareText = postTitle || 'Check out this post on Express'
-
-  const shareLinks = {
-    twitter: `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`,
-    facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`,
-    linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`,
-  }
-
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(shareUrl)
-    alert('Link copied!')
   }
 
   const formatDate = (dateString: string) => {
@@ -265,35 +250,6 @@ export function CommentSection({ postId, postTitle }: CommentSectionProps) {
                             <Icon className="h-4 w-4 text-neutral-300" />
                           </button>
                         ))}
-                      </div>
-                    )}
-                  </div>
-                  
-                  {/* Share */}
-                  <div className="relative">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setShowShare(showShare === comment.id ? null : comment.id)}
-                      className="h-7 px-2 text-xs text-neutral-400 hover:text-white"
-                    >
-                      <Share2 className="mr-1 h-3 w-3" />
-                      Share
-                    </Button>
-                    {showShare === comment.id && (
-                      <div className="absolute left-0 top-8 z-10 flex gap-2 rounded-lg border border-white/10 bg-[#0b0f14] p-2">
-                        <a href={shareLinks.twitter} target="_blank" rel="noopener" className="flex h-8 w-8 items-center justify-center rounded-full hover:bg-white/10">
-                          <Twitter className="h-4 w-4 text-neutral-300" />
-                        </a>
-                        <a href={shareLinks.facebook} target="_blank" rel="noopener" className="flex h-8 w-8 items-center justify-center rounded-full hover:bg-white/10">
-                          <Facebook className="h-4 w-4 text-neutral-300" />
-                        </a>
-                        <a href={shareLinks.linkedin} target="_blank" rel="noopener" className="flex h-8 w-8 items-center justify-center rounded-full hover:bg-white/10">
-                          <Linkedin className="h-4 w-4 text-neutral-300" />
-                        </a>
-                        <button onClick={copyToClipboard} className="flex h-8 w-8 items-center justify-center rounded-full hover:bg-white/10">
-                          <Link2 className="h-4 w-4 text-neutral-300" />
-                        </button>
                       </div>
                     )}
                   </div>
